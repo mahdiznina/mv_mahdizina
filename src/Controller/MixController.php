@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Controller;
-
+use App\Repository\VinylMixRepository;
 use App\Entity\VinylMix;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,7 +16,8 @@ class MixController extends AbstractController
         $mix = new VinylMix();
         $mix->setTitle('Do you Remember... Phil Collins?!');
         $mix->setDescription('A pure mix of drummers turned singers!');
-        $mix->setGenre('pop');
+        $genres = ['pop', 'rock'];
+        $mix->setGenre($genres[array_rand($genres)]);
         $mix->setTrackCount(rand(5, 20));
         $mix->setVotes(rand(-50, 50));
         $entityManager->persist($mix);
@@ -26,5 +27,13 @@ class MixController extends AbstractController
             $mix->getId(),
             $mix->getTrackCount()
         ));
+    }
+    #[Route('/mix/{id}', name: 'app_mix_show')]
+    public function show($id, VinylMixRepository $mixRepository): Response
+    {
+        $mix = $mixRepository->find($id);
+        return $this->render('mix/show.html.twig', [
+            'mix' => $mix,
+        ]);
     }
 }
